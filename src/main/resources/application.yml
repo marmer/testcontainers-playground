@@ -4,6 +4,9 @@ spring:
     password: somePw
     username: someUser
   jpa:
-    generate-ddl: true
+    #    generate-ddl: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+

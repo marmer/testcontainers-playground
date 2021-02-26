@@ -23,7 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @DirtiesContext
 @AutoConfigureMockMvc
 @Testcontainers
-internal class ApiTest {
+internal class ApiIT {
     companion object {
         @Container
         val postgres = PostgreSQLContainer<Nothing>("postgres:12").apply {
