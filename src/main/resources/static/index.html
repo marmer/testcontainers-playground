@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <meta charset="UTF-8">
+  <title>Spaß in Tüten</title>
+</head>
+<body>
+<form id="dbform" onsubmit="return false">
+  <input id="dbValueToStore" name="some value" title="some value" placeholder="some task" required minlength="2">
+  <button type="submit" onclick="saveToDb()">save in DB</button>
+</form>
+<div>
+  <h1>Tasks in DB</h1>
+  <ol id="tasksInDbList">
+    <li>bal1</li>
+    <li>bal2</li>
+  </ol>
+</div>
+</body>
+<script>
+  const saveToDb = () => {
+    console.log(document.getElementById("dbValueToStore").value)
+    fetch("dbtasks", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({description: document.getElementById("dbValueToStore").value})
+    }).then(() => location.reload())
+    return false
+  }
+
+  const loadCurrentTastks = () => {
+    fetch("dbtasks", {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    }).then(response =>
+        response.json()
+    ).then(body => {
+      document.getElementById("tasksInDbList").innerHTML = body.map(task => `<li>${task.description}</li>`).join("\n")
+    })
+  }
+
+  (() =>
+          loadCurrentTastks()
+  )()
+</script>
+</html>
