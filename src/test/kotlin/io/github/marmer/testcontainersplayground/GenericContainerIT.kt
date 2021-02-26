@@ -14,31 +14,39 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-
+import java.time.Duration
+import java.time.temporal.ChronoUnit
 
 @SpringBootTest
 @DirtiesContext
 @AutoConfigureMockMvc
 @Testcontainers
-internal class ApiIT {
+internal class GenericContainerIT {
     companion object {
         @Container
-        val postgres = PostgreSQLContainer<Nothing>("postgres:12").apply {
-            withDatabaseName("someDb")
-            withUsername("someUser")
-            withPassword("somePw")
+        val postgres = GenericContainer<Nothing>("postgres:13").apply {
+            withExposedPorts(5432)
+
+            withEnv("POSTGRES_USER", "someUser")
+            withEnv("POSTGRES_PASSWORD", "somePw")
+            withEnv("POSTGRES_DB", "someDb")
+            setWaitStrategy(
+                LogMessageWaitStrategy()
+                    .withRegEx(".*database system is ready to accept connections.*\\s")
+                    .withTimes(2)
+                    .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS))
+            )
         }
 
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
-            // Yeah. The changing ports allow parallelization
-            registry.add("spring.datasource.url", postgres::getJdbcUrl);
-            registry.add("spring.datasource.password", postgres::getPassword);
-            registry.add("spring.datasource.username", postgres::getUsername);
+            //             Yeah. The changing ports allow parallelization
+            registry.add("spring.datasource.url", { "jdbc:postgresql://localhost:${postgres.firstMappedPort}/someDb" });
         }
     }
 
