@@ -18,7 +18,7 @@ class Api {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createTask(@RequestBody task: Task) {
-        currentTasks += task
+        currentTasks = currentTasks + task
     }
 }
 
