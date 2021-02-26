@@ -22,7 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @DirtiesContext
 @AutoConfigureMockMvc
 @Testcontainers
-internal class AlwaysFreshDb {
+internal class AlwaysFreshDbIT {
     companion object {
         @Container
         val postgres = PostgreSQLContainer<Nothing>("postgres:13").apply {

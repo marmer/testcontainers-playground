@@ -14,10 +14,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.io.File
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 
@@ -25,26 +26,25 @@ import java.time.temporal.ChronoUnit
 @DirtiesContext
 @AutoConfigureMockMvc
 @Testcontainers
-internal class GenericContainerIT {
+internal class ComposeContainerIT {
     companion object {
+        // FIXME: DockerComposeContainer does not work somehow :/
         @Container
-        val postgres = GenericContainer<Nothing>("postgres:13").apply {
-            withExposedPorts(5432)
-
-            withEnv("POSTGRES_USER", "someUser")
-            withEnv("POSTGRES_PASSWORD", "somePw")
-            withEnv("POSTGRES_DB", "someDb")
-            setWaitStrategy(
-                Wait.forLogMessage(".*database system is ready to accept connections.*", 2)
-                    .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS))
-            )
-        }
+        val postgres = DockerComposeContainer<Nothing>(File("docker-compose.yml"))
+            .apply {
+                withExposedService(
+                    "db", 5432, Wait.forLogMessage(".*database system is ready to accept connections.*", 2)
+                        .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS))
+                )
+            }
 
         @JvmStatic
         @DynamicPropertySource
         fun properties(registry: DynamicPropertyRegistry) {
             //             Yeah. The changing ports allow parallelization
-            registry.add("spring.datasource.url", { "jdbc:postgresql://localhost:${postgres.firstMappedPort}/someDb" });
+            registry.add(
+                "spring.datasource.url",
+                { "jdbc:postgresql://localhost:${postgres.getServicePort("db", 5432)}/someDb" })
         }
     }
 
