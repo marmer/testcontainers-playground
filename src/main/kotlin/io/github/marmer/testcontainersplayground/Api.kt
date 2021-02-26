@@ -1,18 +1,26 @@
 package io.github.marmer.testcontainersplayground
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("dbtasks")
 class Api {
-    @GetMapping
-    fun getTasks() = listOf(Task("fancy Description1"), Task("fancy Description2"))
 
+    private var currentTasks: List<Task> = emptyList()
+
+    @GetMapping
+    fun getTasks() =
+        currentTasks
+
+    @PostMapping
+    fun createTask(@RequestBody task: Task) {
+        currentTasks = currentTasks + task
+    }
 }
 
-data class Task(val description: String, val id: String = newUUID())
+data class Task(var description: String) {
+    val id: String = newUUID()
+}
 
 private fun newUUID() = UUID.randomUUID().toString()

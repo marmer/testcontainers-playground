@@ -24,7 +24,7 @@
 </head>
 <body>
 <form id="dbform" onsubmit="return false">
-  <input id="dbValueToStore" name="some value" title="some value" placeholder="some task" required minlength="2">
+  <input id="dbValueToStore" name="some value" title="some value" placeholder="some task">
   <button type="submit" onclick="saveToDb()">save in DB</button>
 </form>
 <div>
@@ -37,14 +37,13 @@
 </body>
 <script>
   const saveToDb = () => {
-    console.log(document.getElementById("dbValueToStore").value)
     fetch("dbtasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({description: document.getElementById("dbValueToStore").value})
-    }).then(() => location.reload())
+    }).then(() => loadCurrentTastks())
     return false
   }
 
