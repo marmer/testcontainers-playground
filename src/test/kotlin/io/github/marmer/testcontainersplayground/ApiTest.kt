@@ -6,16 +6,42 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 
 
 @SpringBootTest
+@DirtiesContext
 @AutoConfigureMockMvc
+@Testcontainers
 internal class ApiTest {
+    companion object {
+        @Container
+        val postgres = PostgreSQLContainer<Nothing>("postgres:12").apply {
+            withDatabaseName("someDb")
+            withUsername("someUser")
+            withPassword("somePw")
+        }
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            // Yeah. The changing ports allow parallelization
+            registry.add("spring.datasource.url", postgres::getJdbcUrl);
+            registry.add("spring.datasource.password", postgres::getPassword);
+            registry.add("spring.datasource.username", postgres::getUsername);
+        }
+    }
+
     @Autowired
     private lateinit var mockMvc: MockMvc
 
