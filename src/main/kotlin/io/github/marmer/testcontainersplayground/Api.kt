@@ -1,5 +1,6 @@
 package io.github.marmer.testcontainersplayground
 
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -10,12 +11,14 @@ class Api {
     private var currentTasks: List<Task> = emptyList()
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     fun getTasks() =
         currentTasks
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     fun createTask(@RequestBody task: Task) {
-        currentTasks = currentTasks + task
+        currentTasks += task
     }
 }
 
