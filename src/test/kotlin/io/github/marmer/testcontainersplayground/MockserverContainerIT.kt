@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.mockserver.client.MockServerClient
 import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse.response
+import org.mockserver.model.MediaType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -47,19 +48,22 @@ internal class MockserverContainerIT {
     @Test
     fun `speichern und laden von Elementen sollte klappen`() {
         // Preparation
-        MockServerClient(mockServer.getHost(), mockServer.getServerPort()).`when`(
-            request()
-                .withPath("/api")
-                .withQueryStringParameter("jahr", "2021")
-        )
-            .respond(
+        MockServerClient(mockServer.getHost(), mockServer.getServerPort())
+            .`when`(
+                request()
+                    .withPath("/api")
+                    .withQueryStringParameter("jahr", "2021")
+            ).respond(
                 response()
-                    .withBody("{\n  \"BW\": {\n    \"Neujahrstag\": {\n      \"datum\": \"2021-01-01\",\n      \"hinweis\": \"\"\n    },\n    \"Heilige Drei Könige\": {\n      \"datum\": \"2021-01-06\",\n      \"hinweis\": \"\"\n    }\n  }\n}")
+                    .withBody(
+                        "{\n  \"BW\": {\n    \"Neujahrstag\": {\n      \"datum\": \"2021-01-01\",\n      \"hinweis\": \"\"\n    },\n    \"Heilige Drei Könige\": {\n      \"datum\": \"2021-01-06\",\n      \"hinweis\": \"\"\n    }\n  }\n}"
+                    )
+                    .withContentType(MediaType.APPLICATION_JSON_UTF_8)
             )
 
         // Execution
         @Language("JSON") val expectedContent =
-            "[\n  {\n    \"date\": \"2021-01-01\",\n    \"name\": \"Neujahrstag\"\n  },\n  {\n    \"date\": \"2021-01-06\",\n    \"name\": \"Heilige Drei Könige\"\n  }\n]"
+            "[{\"date\":\"Heilige Drei Könige\",\"name\":\"2021-01-06\"},{\"date\":\"Neujahrstag\",\"name\":\"2021-01-01\"}]"
         mockMvc.perform(get("/holidays"))
             // Assertion
             .andExpect(status().isOk)
