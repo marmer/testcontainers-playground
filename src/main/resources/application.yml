@@ -10,4 +10,4 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
 myConfig:
-  holidayApiUrl: https://feiertage-api.de/api/?jahr=2021
+  holidayApiUrl: https://feiertage-api.de

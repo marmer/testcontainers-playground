@@ -15,7 +15,7 @@ class Holidays(@Value("\${myConfig.holidayApiUrl}") private val holidayApiUrl: S
     @ResponseStatus(HttpStatus.OK)
     fun getHolidays() =
         RestTemplate().getForObject(
-            holidayApiUrl,
+            "$holidayApiUrl/api/?jahr=2021",
             HolidayMap::class.java
         )!!.toHolidays()
 }
