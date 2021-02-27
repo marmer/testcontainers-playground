@@ -30,8 +30,13 @@
 <div>
   <h1>Tasks in DB</h1>
   <ol id="tasksInDbList">
-    <li>bal1</li>
-    <li>bal2</li>
+    <li>loading...</li>
+  </ol>
+</div>
+<div>
+  <h1>Deutsche Feiertage</h1>
+  <ol id="holidays">
+    <li>loading...</li>
   </ol>
 </div>
 </body>
@@ -54,14 +59,28 @@
         "Accept": "application/json"
       }
     }).then(response =>
-        response.json()
+            response.json()
     ).then(body => {
       document.getElementById("tasksInDbList").innerHTML = body.map(task => `<li data-id="${task.id}">${task.description}</li>`).join("\n")
     })
   }
+  const loadFeiertage = () => {
+    fetch("holidays", {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    }).then(response =>
+            response.json()
+    ).then(body => {
+      document.getElementById("holidays").innerHTML = body.map(holiday => `<li data-id="${holiday.date}">${holiday.date} - ${holiday.name}</li>`).join("\n")
+    })
+  }
 
-  (() =>
-          loadCurrentTastks()
+  (() => {
+            loadCurrentTastks()
+            loadFeiertage()
+          }
   )()
 </script>
 </html>
