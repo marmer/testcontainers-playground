@@ -1,3 +1,4 @@
+version: "3.7" # Omitting the verison or higher versions seam not to be  supported by testcontainers yet
 services:
   db:
     image: postgres:13

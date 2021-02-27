@@ -28,7 +28,6 @@ import java.time.temporal.ChronoUnit
 @Testcontainers
 internal class ComposeContainerIT {
     companion object {
-        // FIXME: DockerComposeContainer does not work somehow :/
         @Container
         val postgres = DockerComposeContainer<Nothing>(File("docker-compose.yml"))
             .apply {
