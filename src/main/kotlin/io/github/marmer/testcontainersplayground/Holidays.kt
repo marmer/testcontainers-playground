@@ -1,5 +1,6 @@
 package io.github.marmer.testcontainersplayground
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -9,12 +10,12 @@ import org.springframework.web.client.RestTemplate
 
 @RestController
 @RequestMapping("holidays")
-class Holidays {
+class Holidays(@Value("\${myConfig.holidayApiUrl}") private val holidayApiUrl: String) {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     fun getHolidays() =
         RestTemplate().getForObject(
-            "https://feiertage-api.de/api/?jahr=2021",
+            holidayApiUrl,
             HolidayMap::class.java
         )!!.toHolidays()
 }
